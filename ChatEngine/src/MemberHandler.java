@@ -5,13 +5,14 @@ import java.util.ArrayList;
 
 public class MemberHandler extends Thread{
 	
-	private volatile ArrayList<Socket> members;
+	private volatile ArrayList<Object> messages;
 	private volatile ServerSocket server;
+	private volatile ArrayList<MemberWrapper> members;
 	private boolean shouldrun;
 	
-	public MemberHandler(ArrayList<Socket> members, ServerSocket server)
+	public MemberHandler(ArrayList<Object> messages, ServerSocket server)
 	{
-		this.members = members;
+		this.messages = messages;
 		this.server = server;
 		shouldrun = true;
 		start();
@@ -19,12 +20,11 @@ public class MemberHandler extends Thread{
 	
 	public void run()
 	{
-		Socket joiningClient;
 		while(shouldrun)
 		{
 			try {
-				joiningClient = server.accept();
-				members.add(joiningClient);
+				Socket joiningClient = server.accept();
+				members.add(new MemberWrapper(joiningClient, messages));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

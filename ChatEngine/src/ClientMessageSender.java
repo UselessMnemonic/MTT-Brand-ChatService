@@ -2,9 +2,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ClientMessageSender<Format> extends Thread{
+public class ClientMessageSender extends Thread{
 
-	private volatile Format message;
+	private volatile Object message;
 	private ObjectOutputStream messageStream;
 	private boolean pendingMessage;
 	private volatile boolean shouldrun;
@@ -18,7 +18,7 @@ public class ClientMessageSender<Format> extends Thread{
 		start();
 	}
 
-	public void sendMessage(Format o) {
+	public void sendMessage(Object o) {
 		this.message = o;
 		pendingMessage = true;
 	}

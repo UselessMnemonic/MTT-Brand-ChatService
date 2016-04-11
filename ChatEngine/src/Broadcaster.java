@@ -1,51 +1,39 @@
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 
-public class Broadcaster<Format> extends Thread{
+public class Broadcaster extends Thread{
 	
-	private volatile ArrayList<Socket> members;
-	private volatile ArrayList<Format> messageBuffer;
+	private volatile ArrayList<MemberWrapper> members;
+	private volatile ArrayList<Object> messageBuffer;
 	private boolean shouldrun;
 	
-	public Broadcaster(ArrayList<Socket> members)
+	public Broadcaster(ArrayList<MemberWrapper> clients)
 	{
-		this.members = members;
-		messageBuffer = new ArrayList<Format>(1);
+		this.members = clients;
+		messageBuffer = new ArrayList<Object>(1);
 		shouldrun = true;
 		start();
 	}
 	
-	public void postMessage(Format o)
+	public void postMessage(Object o)
 	{
 		messageBuffer.add(o);
 	}
 	
 	public void run()
 	{
-		Format brstm;
 		while(shouldrun)
 		{
 			
 			if(messageBuffer.size() > 0)
 			{
-				brstm = messageBuffer.remove(0);
-				
-				for(Socket s : members)
+				Object brstm = messageBuffer.remove(0);
+				for(MemberWrapper m : members)
 				{
 					try {
-						
-						if(s.isClosed()){
-							members.remove(members.indexOf(s));
-						}
-						else
-						{
-						ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-						out.writeObject(brstm);
-						out.flush();
-						}
+						m.send(brstm);
 					} catch (IOException e) {
+						members.remove(members.indexOf(m));
 						e.printStackTrace();
 					}
 				}
@@ -53,10 +41,10 @@ public class Broadcaster<Format> extends Thread{
 		}
 		
 		//ending code
-		for(Socket s : members)
+		for(MemberWrapper m : members)
 		{
 			try {
-				s.close();
+				m.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

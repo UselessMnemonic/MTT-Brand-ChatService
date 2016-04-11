@@ -1,32 +1,28 @@
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
-public class ChatServer<Format> extends Thread{
+public class ChatServer extends Thread{
 	
-	private ArrayList<Socket> CLIENTS;
-	private ArrayList<Format> pendingMessages;
-	private ServerSocket self;
+	private volatile ArrayList<MemberWrapper> CLIENTS;
+	private volatile ArrayList<Object> pendingMessages;
+	private volatile ServerSocket self;
 	private int port;
 	private String addressAndSocket;
 	private MemberHandler clientManager;
-	private Broadcaster<Format> broadcaster;
-	private ServerMessageListener<Format> listener;
+	private Broadcaster broadcaster;
 	
 	public ChatServer(int port) throws IOException
 	{
-		CLIENTS = new ArrayList<Socket>(1);
+		CLIENTS = new ArrayList<MemberWrapper>(1);
 		this.port = port;
 		self = new ServerSocket(port);
 		addressAndSocket = self.toString();
-		clientManager = new MemberHandler(CLIENTS, self);
-		broadcaster = new Broadcaster<Format>(CLIENTS);
-		listener = new ServerMessageListener<Format>(CLIENTS, broadcaster);
+		clientManager = new MemberHandler(pendingMessages, self);
+		broadcaster = new Broadcaster(CLIENTS);
 	}
 	
-	public void sendMessage(Format o)
+	public void sendMessage(Object o)
 	{
 		broadcaster.postMessage(o);
 	}
@@ -35,6 +31,15 @@ public class ChatServer<Format> extends Thread{
 	{
 		clientManager.shutdown();
 		broadcaster.shutdown();
-		listener.shutdown();
+	}
+	
+	public int getPort()
+	{
+		return port;
+	}
+	
+	public ArrayList<Object> getCurrentMessageBuffer()
+	{
+		return pendingMessages;
 	}
 }

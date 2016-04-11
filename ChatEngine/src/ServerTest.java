@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class ServerTest {
 
-	private ChatServer<String> server;
+	private ChatServer server;
 	
 	public ServerTest(int port) throws IOException
 	{

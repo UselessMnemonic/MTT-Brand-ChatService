@@ -2,9 +2,10 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-public class ClientTest implements Chatable<String>{
+public class ClientTest implements Chatable{
 
 	String name;
+	private ChatClient client;
 	
 	public ClientTest(String IP, int port, String name) throws UnknownHostException, IOException
 	{
@@ -13,11 +14,9 @@ public class ClientTest implements Chatable<String>{
 	}
 	
 	@Override
-	public void onMessage(String message) {
-		System.out.println(message);
+	public void onMessage(Object message) {
+		System.out.println((String)message);
 	}
-	
-	private ChatClient<String> client;
 	
 	public static void main(String[] args)
 	{

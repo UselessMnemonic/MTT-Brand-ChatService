@@ -2,20 +2,20 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ChatClient<Format> {
+public class ChatClient {
 	
 	private Socket server;
-	private ClientMessageListener<Format> listener;
-	private ClientMessageSender<Format> sender;
+	private ClientMessageListener listener;
+	private ClientMessageSender sender;
 	
-	public ChatClient(Chatable<Format> client, String IP, int port) throws UnknownHostException, IOException
+	public ChatClient(Chatable client, String IP, int port) throws UnknownHostException, IOException
 	{
 		server = new Socket(IP, port);
-		listener = new ClientMessageListener<Format>(server, client);
-		sender = new ClientMessageSender<Format>(server);
+		listener = new ClientMessageListener(server, client);
+		sender = new ClientMessageSender(server);
 	}
 	
-	public void sendMeesage(Format o)
+	public void sendMeesage(Object o)
 	{
 		sender.sendMessage(o);
 	}

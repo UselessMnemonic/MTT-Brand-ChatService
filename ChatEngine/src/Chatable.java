@@ -1,6 +1,6 @@
 
-public interface Chatable<Format> {
+public interface Chatable {
 	
-	public void onMessage(Format message);
+	public void onMessage(Object message);
 
 }

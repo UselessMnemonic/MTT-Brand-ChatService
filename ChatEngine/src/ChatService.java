@@ -4,14 +4,14 @@ import java.net.UnknownHostException;
 public class ChatService
 {
 	
-	public static <Format> ChatServer<Format> getServer(int port) throws IOException
+	public static ChatServer getServer(int port) throws IOException
 	{
-		return new ChatServer<Format>(port);
+		return new ChatServer(port);
 	}
 	
-	public static <Format> ChatClient<Format> getChatClient(Chatable<Format> implementer, String ip, int port) throws UnknownHostException, IOException
+	public static ChatClient getChatClient(Chatable implementer, String ip, int port) throws UnknownHostException, IOException
 	{
-		return new ChatClient<Format>(implementer, ip, port);
+		return new ChatClient(implementer, ip, port);
 	}
 
 }
