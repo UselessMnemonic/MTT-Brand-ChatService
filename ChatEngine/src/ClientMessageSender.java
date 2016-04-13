@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class ClientMessageSender extends Thread{
@@ -11,9 +12,10 @@ public class ClientMessageSender extends Thread{
 	
 	public ClientMessageSender(Socket s) throws IOException
 	{
-		super();
 		pendingMessage = false;
-		messageStream = new ObjectOutputStream(s.getOutputStream());
+		OutputStream out = s.getOutputStream();
+		messageStream = new ObjectOutputStream(out);
+		System.out.println("OOS saved");
 		shouldrun = true;
 		start();
 	}
@@ -25,6 +27,7 @@ public class ClientMessageSender extends Thread{
 	
 	public void run()
 	{
+		System.out.println("Sender started");
 		while(shouldrun)
 		{
 			if(pendingMessage)

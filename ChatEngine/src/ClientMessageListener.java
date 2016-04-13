@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
@@ -10,8 +11,9 @@ public class ClientMessageListener extends Thread{
 	private volatile boolean shouldrun;
 	
 	public ClientMessageListener(Socket server, Chatable c) throws IOException {
-		super();
-		messageStream = new ObjectInputStream(server.getInputStream());
+		InputStream in = server.getInputStream();
+		messageStream = new ObjectInputStream(in);
+		System.out.println("OIS saved");
 		client = c;
 		shouldrun = true;
 		start();
@@ -19,13 +21,13 @@ public class ClientMessageListener extends Thread{
 
 	public void run()
 	{
+		System.out.println("Listener started");
 		while(shouldrun)
 		{
 			try {
 				message = messageStream.readObject();
 				client.onMessage(message);
 			} catch (IOException | ClassNotFoundException e) {
-				e.printStackTrace();
 			}
 		}
 	}

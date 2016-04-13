@@ -11,6 +11,7 @@ public class ChatClient {
 	public ChatClient(Chatable client, String IP, int port) throws UnknownHostException, IOException
 	{
 		server = new Socket(IP, port);
+		System.out.println("Socket connected");
 		listener = new ClientMessageListener(server, client);
 		sender = new ClientMessageSender(server);
 	}

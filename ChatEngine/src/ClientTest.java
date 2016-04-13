@@ -22,19 +22,18 @@ public class ClientTest implements Chatable{
 	{
 		Scanner in = new Scanner(System.in);
 		System.out.println("Type the IP address: ");
-		String IP = in.nextLine();
+		String IP = in.next();
 		System.out.println("Type the port: ");
 		int port = in.nextInt();
 		System.out.println("Type a name: ");
-		String name = in.nextLine();
+		String name = in.next();
 		
 		try {
 			ClientTest t = new ClientTest(IP, port, name);
-			System.out.println("Server Started!");
 			while(true)
 			{
 				System.out.println("Type a Message: ");
-				String message = in.nextLine();
+				String message = in.next();
 				t.send(message);
 			}
 		} catch (IOException e) {
