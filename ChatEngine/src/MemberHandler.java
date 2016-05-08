@@ -8,7 +8,7 @@ public class MemberHandler extends Thread{
 	private volatile ArrayList<Object> messages;
 	private volatile ServerSocket server;
 	private volatile ArrayList<MemberWrapper> members;
-	private boolean shouldrun;
+	private volatile boolean shouldrun;
 	
 	public MemberHandler(ArrayList<Object> messages, ServerSocket server)
 	{
@@ -24,6 +24,7 @@ public class MemberHandler extends Thread{
 		{
 			try {
 				Socket joiningClient = server.accept();
+				System.out.println("Member Handler: New Member!");
 				members.add(new MemberWrapper(joiningClient, messages));
 			} catch (IOException e) {
 				e.printStackTrace();

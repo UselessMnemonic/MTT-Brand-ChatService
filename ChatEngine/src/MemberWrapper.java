@@ -6,15 +6,12 @@ import java.util.ArrayList;
 
 public class MemberWrapper extends Thread{
 	
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
-	private ArrayList<Object> messages;
-	private Socket client;
+	private volatile ObjectInputStream in;
+	private volatile ObjectOutputStream out;
+	private volatile ArrayList<Object> messages;
+	private volatile Socket client;
 
 	public MemberWrapper(Socket joiningClient, ArrayList<Object> messages) throws IOException {
-		
-		in = new ObjectInputStream(joiningClient.getInputStream());
-		out = new ObjectOutputStream(joiningClient.getOutputStream());
 		this.messages = messages;
 		client = joiningClient;
 		start();
@@ -22,6 +19,14 @@ public class MemberWrapper extends Thread{
 	
 	public void run()
 	{
+		
+		try {
+			Thread.sleep(1000);
+			in = new ObjectInputStream(client.getInputStream());
+			out = new ObjectOutputStream(client.getOutputStream());
+		} catch (InterruptedException | IOException e1) {
+			e1.printStackTrace();
+		}
 		while(true)
 		{
 			try {

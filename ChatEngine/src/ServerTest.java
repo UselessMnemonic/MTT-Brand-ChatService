@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class ServerTest {
 
-	private ChatServer server;
+	private volatile ChatServer server;
 	
 	public ServerTest(int port) throws IOException
 	{
@@ -30,7 +30,6 @@ public class ServerTest {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			in.close();
 		}
 	}
 

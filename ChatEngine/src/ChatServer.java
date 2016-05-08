@@ -7,10 +7,10 @@ public class ChatServer extends Thread{
 	private volatile ArrayList<MemberWrapper> CLIENTS;
 	private volatile ArrayList<Object> pendingMessages;
 	private volatile ServerSocket self;
-	private int port;
+	private volatile int port;
 	private String addressAndSocket;
-	private MemberHandler clientManager;
-	private Broadcaster broadcaster;
+	private volatile MemberHandler clientManager;
+	private volatile Broadcaster broadcaster;
 	
 	public ChatServer(int port) throws IOException
 	{

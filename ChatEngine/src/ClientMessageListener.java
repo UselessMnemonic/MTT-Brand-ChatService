@@ -1,19 +1,17 @@
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 
 public class ClientMessageListener extends Thread{
 	
-	private ObjectInputStream messageStream;
+	private volatile ObjectInputStream messageStream;
 	private volatile Object message;
-	private Chatable client;
+	private volatile Chatable client;
 	private volatile boolean shouldrun;
 	
 	public ClientMessageListener(Socket server, Chatable c) throws IOException {
-		InputStream in = server.getInputStream();
-		messageStream = new ObjectInputStream(in);
-		System.out.println("OIS saved");
+		messageStream = new ObjectInputStream(server.getInputStream());
+		System.out.println("IN established!");
 		client = c;
 		shouldrun = true;
 		start();
@@ -21,7 +19,7 @@ public class ClientMessageListener extends Thread{
 
 	public void run()
 	{
-		System.out.println("Listener started");
+		System.out.println("Listener started!");
 		while(shouldrun)
 		{
 			try {

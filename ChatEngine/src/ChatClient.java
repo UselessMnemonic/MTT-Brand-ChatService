@@ -4,9 +4,9 @@ import java.net.UnknownHostException;
 
 public class ChatClient {
 	
-	private Socket server;
-	private ClientMessageListener listener;
-	private ClientMessageSender sender;
+	private volatile Socket server;
+	private volatile ClientMessageListener listener;
+	private volatile ClientMessageSender sender;
 	
 	public ChatClient(Chatable client, String IP, int port) throws UnknownHostException, IOException
 	{

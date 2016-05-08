@@ -6,16 +6,16 @@ import java.net.Socket;
 public class ClientMessageSender extends Thread{
 
 	private volatile Object message;
-	private ObjectOutputStream messageStream;
-	private boolean pendingMessage;
+	private volatile ObjectOutputStream messageStream;
+	private volatile boolean pendingMessage;
 	private volatile boolean shouldrun;
 	
 	public ClientMessageSender(Socket s) throws IOException
 	{
 		pendingMessage = false;
 		OutputStream out = s.getOutputStream();
+		System.out.println("OUT established!");
 		messageStream = new ObjectOutputStream(out);
-		System.out.println("OOS saved");
 		shouldrun = true;
 		start();
 	}
@@ -27,7 +27,7 @@ public class ClientMessageSender extends Thread{
 	
 	public void run()
 	{
-		System.out.println("Sender started");
+		System.out.println("Sender started!");
 		while(shouldrun)
 		{
 			if(pendingMessage)

@@ -5,7 +5,7 @@ public class Broadcaster extends Thread{
 	
 	private volatile ArrayList<MemberWrapper> members;
 	private volatile ArrayList<Object> messageBuffer;
-	private boolean shouldrun;
+	private volatile boolean shouldrun;
 	
 	public Broadcaster(ArrayList<MemberWrapper> clients)
 	{
