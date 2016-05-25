@@ -1,16 +1,10 @@
-import java.io.IOException;
-import java.util.ArrayList;
-
 public class Broadcaster extends Thread{
 
-	private volatile ArrayList<ClientWrapper> clients;
-	private volatile ArrayList<Object> pendingMessages;
+	private ServerResourceManager res;
 	private volatile boolean shouldRun;
-	
-	public Broadcaster(ArrayList<ClientWrapper> clients, ArrayList<Object> pendingMessages) {
-		this.clients = clients;
-		this.pendingMessages = pendingMessages;
-		shouldRun = true;
+
+	public Broadcaster(ServerResourceManager res) {
+		this.res = res;
 		start();
 	}
 
@@ -23,19 +17,11 @@ public class Broadcaster extends Thread{
 	{
 		while(shouldRun)
 		{
-			if(pendingMessages.size() > 0)
+			if(res.hasNextMessage())
 			{
 				System.out.println("SERVER: Broadcasting next message...");
-				Object nextMessage = pendingMessages.remove(0);
-				for(int x = 0; x< clients.size(); x++)
-				{
-					ClientWrapper nextClient = clients.get(x);
-					try {
-						nextClient.sendMessage(nextMessage);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
+				Object nextMessage = res.removeNextMessage();
+				res.sendToClients(nextMessage);
 			}
 		}
 	}

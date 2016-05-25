@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Test implements Chatable{
 
@@ -35,6 +37,11 @@ public class Test implements Chatable{
 			}
 		});
 	}
+	
+	public Test thisInstance()
+	{
+		return this;
+	}
 
 	/**
 	 * Create the application.
@@ -48,6 +55,17 @@ public class Test implements Chatable{
 	 */
 	private void initialize() {
 		frmTestWindow = new JFrame();
+		frmTestWindow.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				try {
+					server.shutdown();
+					client.shutdown();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		frmTestWindow.setTitle("Test Window");
 		frmTestWindow.setBounds(100, 100, 725, 476);
 		frmTestWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,8 +82,10 @@ public class Test implements Chatable{
 				try{
 				if (dualMode.getText().equals("Start"))
 				{
-					dualMode.setText("Send");
 					startService();
+					dualMode.setText("Send");
+					ipField.setEditable(false);
+					portField.setEditable(false);
 				}
 				else
 				{
@@ -108,9 +128,18 @@ public class Test implements Chatable{
 	}
 
 	protected void startService() throws NumberFormatException, UnknownHostException, IOException {
-		System.out.println("Starting Server...");
-		server = new Server(portField.getText());
-		client = new Client(ipField.getText() , portField.getText(), this);
+		new Thread(new Runnable(){
+
+			@Override
+			public void run() {
+				try {
+					server = new Server(portField.getText());
+					client = new Client(ipField.getText() , portField.getText(), thisInstance());
+				} catch (NumberFormatException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
 	@Override

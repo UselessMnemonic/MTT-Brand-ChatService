@@ -5,20 +5,16 @@ import java.util.ArrayList;
 
 public class ClientManager extends Thread{
 
-	private volatile ServerSocket incomingClients;
+	private ServerResourceManager res;
 	private volatile boolean shouldRun;
-	private volatile ArrayList<ClientWrapper> clients;
-	private volatile ArrayList<Object> pendingMessages;
 	
-	public ClientManager(ServerSocket self, ArrayList<ClientWrapper> clients, ArrayList<Object> pendingMessages) {
-		this.pendingMessages = pendingMessages;
-		this.clients = clients;
-		incomingClients = self;
+	public ClientManager(ServerResourceManager res) {
+		this.res = res;
 		shouldRun = true;
 		start();
 	}
 
-	public synchronized void shutDown()
+	public void shutDown()
 	{
 		shouldRun = false;
 	}
@@ -28,10 +24,10 @@ public class ClientManager extends Thread{
 		while(shouldRun)
 		{
 			try {
-				System.out.println("SERVER: Waiting for client...");
-				Socket incomingClient = incomingClients.accept();
+				System.out.println("SERVER: Waiting for a new client...");
+				Socket incomingClient = res.acceptNextClient();
 				System.out.println("SERVER: Client connected!");
-				new ClientWrapper(incomingClient, pendingMessages, clients);
+				new ClientWrapper(incomingClient, res);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

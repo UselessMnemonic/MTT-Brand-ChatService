@@ -7,25 +7,21 @@ import java.util.ArrayList;
 public class ClientWrapper extends Thread{
 
 	private volatile Socket wrappedClient;
+	private ObjectInputStream input;
+	private ObjectOutputStream output;
+	private ServerResourceManager res;
 	private volatile boolean shouldRun;
-	private volatile ObjectInputStream incomingMessages;
-	private volatile ObjectOutputStream outgoingMessages;
-	private volatile ArrayList<Object> pendingMessages;
-	private volatile ArrayList<ClientWrapper> parent;
 	private volatile boolean alive;
 	
-	public ClientWrapper(Socket incomingClient, ArrayList<Object> pendingMessages, ArrayList<ClientWrapper> clients) throws IOException {
+	public ClientWrapper(Socket incomingClient, ServerResourceManager res) throws IOException {
+		this.res = res;
+		output = new ObjectOutputStream(incomingClient.getOutputStream());
+		input = new ObjectInputStream(incomingClient.getInputStream());
 		System.out.println("SERVER: Wrapping new client...");
 		alive = true;
-		parent = clients;
 		wrappedClient = incomingClient;
 		shouldRun = true;
-		System.out.println("SERVER: Grabbing client's input...");
-		incomingMessages = new ObjectInputStream(wrappedClient.getInputStream());
-		System.out.println("SERVER: Grabbing client's output...");
-		outgoingMessages = new ObjectOutputStream(wrappedClient.getOutputStream());
-		System.out.println("SERVER: Adding new client...");
-		clients.add(this);
+		res.addClient(this);
 		start();
 	}
 
@@ -35,9 +31,10 @@ public class ClientWrapper extends Thread{
 		{
 			try {
 				System.out.println("SERVER: Waiting for client's message...");
-				Object incomingMessage = incomingMessages.readObject();
+				Object incomingMessage = input.readObject();
 				System.out.println("SERVER: Got client's message! Adding to list...");
-				pendingMessages.add(incomingMessage);
+				res.addMessage(incomingMessage);
+				System.out.println("SERVER: Added message to list!");
 			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();
 			}
@@ -45,25 +42,25 @@ public class ClientWrapper extends Thread{
 		try {
 			alive = false;
 			wrappedClient.close();
-			parent.remove(parent.indexOf(this));
+			res.removeClient(this);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public synchronized void shutDown()
+	public void shutDown()
 	{
 		shouldRun = false;
 	}
 	
-	public synchronized boolean isRunning()
+	public boolean isRunning()
 	{
 		return alive;
 	}
 
 	public synchronized void sendMessage(Object nextMessage) throws IOException {
-		outgoingMessages.writeObject(nextMessage);
-		outgoingMessages.flush();
+		output.writeObject(nextMessage);
+		output.flush();
 	}
 	
 }
