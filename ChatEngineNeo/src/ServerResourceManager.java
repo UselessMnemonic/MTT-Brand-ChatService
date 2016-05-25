@@ -20,55 +20,62 @@ public class ServerResourceManager {
 		 System.out.println("SERVER: Initializing Client Manager...");
 	}
 
-	public synchronized boolean hasNextMessage() {
+	public boolean hasNextMessage() {
 		return pendingMessages.size() > 0;
 	}
 
-	public synchronized int messageListSize() {
+	public int messageListSize() {
 		return pendingMessages.size();
 	}
 
-	public synchronized Object removeNextMessage() {
+	public Object removeNextMessage() {
 		return pendingMessages.remove(0);
 	}
 
-	public synchronized ClientWrapper getClient(int x) {
+	public ClientWrapper getClient(int x) {
 		return clients.get(0);
 	}
 
-	public synchronized void sendToClients(Object nextMessage) {
-		ArrayList<ClientWrapper> currClient = new ArrayList<ClientWrapper>();
-		for(ClientWrapper cw : clients)
-		{
-			currClient.add(cw);
-		}
-		for(ClientWrapper cw : currClient)
+	public void sendToClients(Object nextMessage) {
+		new Thread(){ public void run(){
+		Object[] currClient = clients.toArray();
+		System.out.println("SERVER: Got Array...");
+		for(Object cw : currClient)
 		{
 			try {
-				cw.sendMessage(nextMessage);
+				((ClientWrapper)cw).sendMessage(nextMessage);
+				System.out.println("SERVER: Sent to Client...");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		}}.start();
 	}
 
-	public synchronized Socket acceptNextClient() throws IOException {
+	public Socket acceptNextClient() throws IOException {
 		return self.accept();
 	}
 
-	public synchronized void addClient(ClientWrapper clientWrapper) {
+	public void addClient(ClientWrapper clientWrapper) {
+		new Thread(){ public void run(){
 		clients.add(clientWrapper);
+		}}.start();
 	}
 
-	public synchronized void addMessage(Object incomingMessage) {
+	public void addMessage(Object incomingMessage) {
+		Thread ugh = new Thread(){ public void run(){
 		pendingMessages.add(incomingMessage);
+		}};
+		ugh.start();
 	}
 
-	public synchronized void removeClient(ClientWrapper clientWrapper) {
+	public void removeClient(ClientWrapper clientWrapper) {
+		new Thread(){ public void run(){
 		clients.remove(clients.indexOf(clientWrapper));
+		}}.start();
 	}
 
-	public synchronized void shutdown() {
+	public void shutdown() {
 		for(ClientWrapper cw : clients)
 			cw.shutDown();
 		try {

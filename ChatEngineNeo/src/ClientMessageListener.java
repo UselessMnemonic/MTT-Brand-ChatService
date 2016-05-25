@@ -5,7 +5,7 @@ import java.io.ObjectOutputStream;
 
 public class ClientMessageListener extends Thread{
 
-	private volatile ObjectInputStream incomingMessages;
+	private ObjectInputStream incomingMessages;
 	private volatile boolean shouldRun;
 	private Chatable parent;
 	

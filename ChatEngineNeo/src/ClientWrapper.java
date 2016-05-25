@@ -30,7 +30,6 @@ public class ClientWrapper extends Thread{
 		while(shouldRun)
 		{
 			try {
-				System.out.println("SERVER: Waiting for client's message...");
 				Object incomingMessage = input.readObject();
 				System.out.println("SERVER: Got client's message! Adding to list...");
 				res.addMessage(incomingMessage);
@@ -58,9 +57,11 @@ public class ClientWrapper extends Thread{
 		return alive;
 	}
 
-	public synchronized void sendMessage(Object nextMessage) throws IOException {
+	public void sendMessage(Object nextMessage) throws IOException {
 		output.writeObject(nextMessage);
+		System.out.println("SERVER WROTE TO OUTPUT");
 		output.flush();
+		System.out.println("SERVER FLUSHED");
 	}
 	
 }

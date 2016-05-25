@@ -27,7 +27,7 @@ public class Client {
 		this(ip, new Integer(port), parent);
 	}
 
-	public synchronized void sendMessage(Object message) throws IOException
+	public void sendMessage(Object message) throws IOException
 	{
 		sendMessages.writeObject(message);
 	}

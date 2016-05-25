@@ -4,6 +4,7 @@ public class Broadcaster extends Thread{
 	private volatile boolean shouldRun;
 
 	public Broadcaster(ServerResourceManager res) {
+		shouldRun = true;
 		this.res = res;
 		start();
 	}
@@ -21,7 +22,9 @@ public class Broadcaster extends Thread{
 			{
 				System.out.println("SERVER: Broadcasting next message...");
 				Object nextMessage = res.removeNextMessage();
+				System.out.println("SERVER: Got next message...");
 				res.sendToClients(nextMessage);
+				System.out.println("SERVER: Sent last message...");
 			}
 		}
 	}
