@@ -29,7 +29,7 @@ public class ClientManager extends Thread{
 				System.out.println("SERVER: Client connected!");
 				new ClientWrapper(incomingClient, res);
 			} catch (IOException e) {
-				e.printStackTrace();
+				shouldRun = false;
 			}
 		}
 	}
