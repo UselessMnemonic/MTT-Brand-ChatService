@@ -8,10 +8,10 @@ public class ChatableTextArea extends TextArea implements Chatable{
 	public void onMessage(Object message) {
 		if(isFirstMessage){
 			isFirstMessage = false;
-			setText(getText() + new java.util.Date().getTime() + ": " + (String)message);
+			setText(getText() + (String)message);
 		}
 		else
-			setText(getText() + "\n@" + new java.util.Date().getTime() + ": " + (String)message);
+			setText(getText() + "\n" + (String)message);
 	}
 
 	public ChatableTextArea()

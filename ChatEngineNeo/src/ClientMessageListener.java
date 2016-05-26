@@ -26,7 +26,8 @@ public class ClientMessageListener extends Thread{
 				System.out.println("CLIENT: Client got message!");
 				parent.onMessage(nextMessage);
 			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
+				shouldRun = false;
+				parent.onMessage("@Error: Server disconnected!");
 			}
 		}
 	}

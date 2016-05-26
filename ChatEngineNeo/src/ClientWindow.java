@@ -56,6 +56,7 @@ public class ClientWindow {
 			public void windowClosed(WindowEvent e) {
 				if(client != null)
 					try {
+						client.sendMessage(username.getText() + " has disconnected.");
 						client.shutdown();
 					} catch (IOException e1) {
 						e1.printStackTrace();
@@ -95,7 +96,7 @@ public class ClientWindow {
 				else
 				{
 					try {
-						client.sendMessage(input.getText());
+						client.sendMessage(username.getText() + ": " + input.getText());
 						input.setText("");
 					} catch (IOException e1) {
 						textWindow.onMessage("@Error: Coudln't send!");

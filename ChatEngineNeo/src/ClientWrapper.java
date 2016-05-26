@@ -35,7 +35,7 @@ public class ClientWrapper extends Thread{
 				res.addMessage(incomingMessage);
 				System.out.println("SERVER: Added message to list!");
 			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
+				shouldRun = false;
 			}
 		}
 		try {
