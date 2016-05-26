@@ -92,6 +92,15 @@ public class ClientWindow {
 						actionBttn.setText("Connect");
 					}
 				}
+				else
+				{
+					try {
+						client.sendMessage(input.getText());
+						input.setText("");
+					} catch (IOException e1) {
+						textWindow.onMessage("@Error: Coudln't send!");
+					}
+				}
 			}
 		});
 		actionBttn.setBounds(315, 246, 129, 26);
