@@ -13,28 +13,13 @@ public class Broadcaster extends Thread
 	
 	public void run()
 	{
-		Message messageToSend;
-		
 		while(shouldRun)
 		{
 			if(resources.hasPendingMessage())
 			{
 				resources.communicateDebug("NEED TO SEND MESSAGE");
-				messageToSend = resources.getNextPendingMessage();
-				
-				if(messageToSend.getDestination().equals("ALL"))
-				{
-					resources.sendToClients(messageToSend);
-				}
-				else if(messageToSend.getDestination().equals("HOST"))
-				{
-					resources.communicateSystemMessage(messageToSend);
-				}
-				else
-				{
-					resources.sendToClient(messageToSend.getDestination(), messageToSend);
-				}
-				
+				String messageToSend = resources.getNextPendingMessage();
+				resources.sendToClients(messageToSend);
 				resources.communicateDebug("COMPLETED BROADCASTING CYCLE");
 			}
 		}

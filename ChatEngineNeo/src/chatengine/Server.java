@@ -15,7 +15,7 @@ public class Server
 		broadcaster.start();
 	}
 	
-	public Server(int port, ServerHandler debugHandler)
+	public Server(int port, DebugHandler debugHandler)
 	{
 		debugHandler.onDebug("SERVER OBJECT CREATED, BEGINING SUBMODULE CONSTRUCTION");
 		resources = new ServerResourceManager(debugHandler);
@@ -29,16 +29,6 @@ public class Server
 		debugHandler.onDebug("CLIENT MANAGER STARTED");
 		broadcaster.start();
 		debugHandler.onDebug("BROADCASTER STARTED");
-	}
-	
-	public void sendToClients(Message messageToSend)
-	{
-		resources.sendToClients(messageToSend);
-	}
-
-	public void sendToClient(String clientID, Message messageToSend)
-	{
-		resources.sendToClient(clientID, messageToSend);
 	}
 	
 	public void shutdown()

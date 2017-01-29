@@ -1,35 +1,41 @@
 package chatengine;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class ClientWrapper extends Thread
 {
 	private Socket 					clientConnection;
-	private BufferedUTF8Reader 				in;
-	private BufferedUTF8Writer 				out;
+	private BufferedReader 			in;
+	private BufferedWriter 			out;
 	private ServerResourceManager 	resources;
 	private boolean 				alive;
-	private String					clientID;
 	
 	public ClientWrapper(Socket clientConnection, ServerResourceManager resources) throws IOException
 	{
 		this.clientConnection = clientConnection;
 		this.resources = resources;
-		clientID = clientConnection.getInetAddress().toString();
-		in = new BufferedUTF8Reader(clientConnection.getInputStream());
+		
+		in = new BufferedReader(new InputStreamReader(clientConnection.getInputStream(), StandardCharsets.UTF_8));
 		resources.communicateDebug("CREATED WRAPPER READER");
-		out = new BufferedUTF8Writer(clientConnection.getOutputStream());
+		out = new BufferedWriter(new OutputStreamWriter(clientConnection.getOutputStream(), StandardCharsets.UTF_8));
 		resources.communicateDebug("CREATED WRAPPER WRITER");
 		alive = true;
 	}
 	
-	public void sendMessage(String messageContent)
+	public void sendMessage(String s)
 	{
 		
 		try
 		{
-			out.write(messageContent);
+			out.write(s);
+			out.append('\n');
+			out.flush();
 			resources.communicateDebug("WROTE MESSAGE TO STREAM");
 		} 
 		catch (IOException e)
@@ -49,10 +55,9 @@ public class ClientWrapper extends Thread
 			{
 				if(in.ready())
 				{
-					
-					recievedMessage = in.read();
+					recievedMessage = in.readLine();
 					resources.communicateDebug("CLIENT HAS SENT MESSAGE");
-					resources.addMessage(new Message(recievedMessage));
+					resources.addMessage(recievedMessage);
 				}
 			}
 			catch (IOException e)
@@ -80,10 +85,5 @@ public class ClientWrapper extends Thread
 	public boolean isClientAlive()
 	{
 		return alive;
-	}
-
-	public String getClientID()
-	{
-		return clientID;
 	}
 }

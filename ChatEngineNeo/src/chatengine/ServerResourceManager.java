@@ -5,23 +5,23 @@ import java.util.ArrayList;
 public class ServerResourceManager
 {
 	private volatile ArrayList<ClientWrapper> 	clientPool;
-	private volatile ArrayList<Message> 		messagePool;
-	private 		 ServerHandler				host;
+	private volatile ArrayList<String> 			messagePool;
+	private 		 DebugHandler				debug;
 	
 	public ServerResourceManager()
 	{
 		clientPool = new ArrayList<ClientWrapper>();
-		messagePool = new ArrayList<Message>();
-		host = null;
+		messagePool = new ArrayList<String>();
+		debug = null;
 	}
 	
-	public ServerResourceManager(ServerHandler host)
+	public ServerResourceManager(DebugHandler debug)
 	{
 		this();
-		this.host = host;
+		this.debug = debug;
 	}
 	
-	public synchronized void addMessage(Message messageToAdd)
+	public synchronized void addMessage(String messageToAdd)
 	{
 		communicateDebug("ADDING MESSAGE TO MESSAGE POOL");
 		messagePool.add(messageToAdd);
@@ -32,38 +32,21 @@ public class ServerResourceManager
 		return !messagePool.isEmpty();
 	}
 	
-	public synchronized void sendToClients(Message message)
+	public synchronized void sendToClients(String message)
 	{
 		for(ClientWrapper cw : clientPool)
 		{
 			new Thread(){
 				public void run()
 				{
-					cw.sendMessage(message.toString());
+					cw.sendMessage(message);
 				}
 			}.start();
 			communicateDebug("MESSAGE BROADCAST THREAD SPAWNED");
 		}
 	}
 	
-	public synchronized void sendToClient(String clientID, Message messageToSend)
-	{
-		for(ClientWrapper cw : clientPool)
-		{
-			if(cw.getClientID().equals(clientID))
-			{
-				new Thread(){
-					public void run()
-					{
-						cw.sendMessage(messageToSend.toString());
-					}
-				}.start();
-				break;
-			}
-		}
-	}
-	
-	public synchronized Message getNextPendingMessage()
+	public synchronized String getNextPendingMessage()
 	{
 		communicateDebug("GOT NEXT PENDING MESSAGE");
 		return messagePool.remove(0);
@@ -99,25 +82,17 @@ public class ServerResourceManager
 
 	public void communicateDebug(Exception e)
 	{
-		if(host != null)
-			host.onDebug(e);
+		if(debug != null)
+			debug.onDebug(e);
 		else
 			e.printStackTrace();
 	}
 	
 	public void communicateDebug(String debugMessage)
 	{
-		if(host != null)
-			host.onDebug(debugMessage);
+		if(debug != null)
+			debug.onDebug(debugMessage);
 		else
 			System.out.println(debugMessage);
-	}
-
-	public void communicateSystemMessage(Message systemMessage)
-	{
-		if(host != null)
-			host.onSystemMessage(systemMessage);
-		else
-			System.out.println("++START SYSTEM MESSAGE++\n" + systemMessage.getContent() + "++END SYSTEM MESSAGE++");
 	}
 }
