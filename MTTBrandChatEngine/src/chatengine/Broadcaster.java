@@ -1,10 +1,18 @@
 package chatengine;
-
+/**
+ * 
+ * @author Christopher Madrigal
+ * The Broadcaster class enables messages to be routed across all clients connected to the server.
+ */
 public class Broadcaster extends Thread
 {
 	private ServerResourceManager resources;
 	private boolean shouldRun;
 	
+	/**
+	 * Creates a new Broadcaster object
+	 * @param resources The ServerResourceManager that provides resource access
+	 */
 	public Broadcaster(ServerResourceManager resources)
 	{
 		this.resources = resources;
@@ -40,6 +48,9 @@ public class Broadcaster extends Thread
 		}
 	}
 
+	/**
+	 * Stops sending messages
+	 */
 	public void shutdown()
 	{
 		shouldRun = false;

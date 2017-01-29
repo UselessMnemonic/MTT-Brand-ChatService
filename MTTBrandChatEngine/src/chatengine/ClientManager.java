@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * 
+ * @author Christopher Madrigal
+ * The ClientManager class provides clients with a connection to the server.
+ */
 public class ClientManager extends Thread
 {
 
@@ -11,6 +16,11 @@ public class ClientManager extends Thread
 	private ServerSocket incomingClientSocket;
 	private boolean shouldRun;
 	
+	/**
+	 * Creates a ClientManager object
+	 * @param port The port to listen to for clients
+	 * @param resources The ServerResourceManager object that provides access to the Client pool
+	 */
 	public ClientManager(int port, ServerResourceManager resources)
 	{
 		this.resources = resources;
@@ -51,6 +61,9 @@ public class ClientManager extends Thread
 		}
 	}
 
+	/**
+	 * Closes the server's client listening socket
+	 */
 	public void shutdown()
 	{
 		shouldRun = false;

@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+/**
+ * 
+ * @author Christopher Madrigal
+ * The Client class is the front-end of the Client implementation of this chat engine.
+ */
 public class Client extends Thread
 {
 	private Chatable				parent;
@@ -12,6 +17,14 @@ public class Client extends Thread
 	private BufferedUTF8Writer 		out;
 	private boolean 				shouldRun;
 	
+	/**
+	 * Constructs a new Client object.
+	 * @param ip The IP address of the server.
+	 * @param port The port to connect to.
+	 * @param parent The Chatable that responds to messages.
+	 * @throws UnknownHostException thrown by internal Socket
+	 * @throws IOException thrown by internal IO streams
+	 */
 	public Client(String ip, int port, Chatable parent) throws UnknownHostException, IOException
 	{
 		shouldRun = true;
@@ -42,6 +55,12 @@ public class Client extends Thread
 		}
 	}
 	
+	/**
+	 * Sends a message to the server.
+	 * @param message The Message object whose JSON Serialized form will be transmitted to the server.
+	 * 
+	 * @see Chatable (Exceptions are rerouted to the parent)
+	 */
 	public void sendMessage(Message message)
 	{
 		try
@@ -54,11 +73,10 @@ public class Client extends Thread
 		}
 	}
 	
-	public void sendMessage(String message)
-	{
-		sendMessage(Message.constructMessage(message));
-	}
-	
+	/**
+	 * Closes the underlying Socket.
+	 * @see Chatable (Exceptions are rerouted to the parent)
+	 */
 	public void shutdown()
 	{
 		shouldRun = false;

@@ -2,36 +2,56 @@ package chatengine;
 
 import java.util.ArrayList;
 
+/**
+ * 
+ * @author Christopher Madrigal
+ * <p>The ServerResourceManager object encapsulates all resource IO into a safe concurrency framework 
+ * to facilitate data consistency between both producers and consumers of Clients and Messages</p>
+ *
+ */
 public class ServerResourceManager
 {
-	private volatile ArrayList<ClientWrapper> 	clientPool;
-	private volatile ArrayList<Message> 		messagePool;
-	private 		 ServerHandler				host;
+	private volatile ArrayList<ClientWrapper> 	clientPool; ///The ArrayList that contains all clients in service
+	private volatile ArrayList<Message> 		messagePool; ///The ArrayList that contains messages in LIFO order
+	private 		 ServerHandler				host; ///The ServerHandeler that responds to debug and exception events
 	
-	public ServerResourceManager()
+	/**
+	 * Constructs a new ServerResourceManager.
+	 * @param host the ServerHandler that responds to debug info.
+	 * @see ServerHandler
+	 */
+	public ServerResourceManager(ServerHandler host)
 	{
 		clientPool = new ArrayList<ClientWrapper>();
 		messagePool = new ArrayList<Message>();
-		host = null;
-	}
-	
-	public ServerResourceManager(ServerHandler host)
-	{
-		this();
 		this.host = host;
 	}
 	
+	/**
+	 * Adds a message to the message pool.
+	 * @param messageToAdd The message to add to the message pool
+	 * @see Message
+	 */
 	public synchronized void addMessage(Message messageToAdd)
 	{
 		communicateDebug("ADDING MESSAGE TO MESSAGE POOL");
 		messagePool.add(messageToAdd);
 	}
 	
+	/**
+	 * Returns the state of the message pool.
+	 * @return True if the messagePool has messages waiting.
+	 */
 	public boolean hasPendingMessage()
 	{
 		return !messagePool.isEmpty();
 	}
 	
+	/**
+	 * Broadcasts a message to all clients in the client pool.
+	 * @param message The message to be sent to all clients.
+	 * @see Message
+	 */
 	public synchronized void sendToClients(Message message)
 	{
 		for(ClientWrapper cw : clientPool)
@@ -39,13 +59,19 @@ public class ServerResourceManager
 			new Thread(){
 				public void run()
 				{
-					cw.sendMessage(message.toString());
+					cw.sendMessage(message);
 				}
 			}.start();
 			communicateDebug("MESSAGE BROADCAST THREAD SPAWNED");
 		}
 	}
 	
+	/**
+	 * Sends a message to a specific client.
+	 * @param clientID A client's internal client ID.
+	 * @param messageToSend The message to send.
+	 * @see Message
+	 */
 	public synchronized void sendToClient(String clientID, Message messageToSend)
 	{
 		for(ClientWrapper cw : clientPool)
@@ -55,7 +81,7 @@ public class ServerResourceManager
 				new Thread(){
 					public void run()
 					{
-						cw.sendMessage(messageToSend.toString());
+						cw.sendMessage(messageToSend);
 					}
 				}.start();
 				break;
@@ -63,18 +89,32 @@ public class ServerResourceManager
 		}
 	}
 	
-	public synchronized Message getNextPendingMessage()
+	/**
+	 * @return The next message in the message pool.
+	 * @throws ArrayIndexOutOfBoundsException if the underlying message pool is empty.
+	 * @see Message
+	 */
+	public synchronized Message getNextPendingMessage() throws ArrayIndexOutOfBoundsException
 	{
 		communicateDebug("GOT NEXT PENDING MESSAGE");
 		return messagePool.remove(0);
 	}
 	
+	/**
+	 * Adds a client to the client pool
+	 * @param clientToAdd the ClientWrapper to add to the client.
+	 * @see ClientWrapper
+	 */
 	public synchronized void addClient(ClientWrapper clientToAdd)
 	{
 		clientPool.add(clientToAdd);
 		communicateDebug("CLIENT ADDED");
 	}
 	
+	/**
+	 * Purges the client pool of dead clients
+	 * @see ClientWrapper
+	 */
 	public synchronized void cleanClientPool()
 	{
 		for(int i = clientPool.size()-1; i >= 0; i--)
@@ -88,6 +128,10 @@ public class ServerResourceManager
 		communicateDebug("CLIENT POOL CLEANED");
 	}
 
+	/**
+	 * Clears the client pool
+	 * @see ClientWrapper
+	 */
 	public void purge()
 	{
 		for(ClientWrapper cw : clientPool)
@@ -97,6 +141,13 @@ public class ServerResourceManager
 		}
 	}
 
+	/**
+	 * Sends an Exception to the Host
+	 * @param e The Exception thrown by an inner mechanism
+	 * @see Exception
+	 * @see Exception
+	 * @see ServerHandler
+	 */
 	public void communicateDebug(Exception e)
 	{
 		if(host != null)
@@ -105,6 +156,11 @@ public class ServerResourceManager
 			e.printStackTrace();
 	}
 	
+	/**
+	 * Sends a debug message to the host.
+	 * @param debugMessage The string containing the message.
+	 * @see ServerHandler
+	 */
 	public void communicateDebug(String debugMessage)
 	{
 		if(host != null)
@@ -113,6 +169,11 @@ public class ServerResourceManager
 			System.out.println(debugMessage);
 	}
 
+	/**
+	 * Sends a message to the ServerHandler
+	 * @see ServerHandler
+	 * @param systemMessage The message that is to be sent to the host
+	 */
 	public void communicateSystemMessage(Message systemMessage)
 	{
 		if(host != null)

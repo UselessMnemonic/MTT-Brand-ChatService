@@ -13,7 +13,7 @@ public class Tester implements ServerHandler, Chatable
 	}
 
 	@Override
-	public void onError(IOException e)
+	public void onError(Exception e)
 	{
 		e.printStackTrace();
 	}
@@ -42,7 +42,7 @@ public class Tester implements ServerHandler, Chatable
 			Tester test = new Tester();
 			Server server = new Server(5545, test);
 			Client c = new Client("localhost", 5545, test);
-			c.sendMessage("This is a test message.");
+			c.sendMessage(Message.constructMessage("This is a test message."));
 			while(true);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
